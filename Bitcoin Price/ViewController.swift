@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
@@ -45,8 +47,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedCurrency = currencyIdentifierArray[row]
         
-       appendApiURL = "https://api.coindesk.com/v1/bpi/currentprice/\(selectedCurrency).json"
+       appendApiURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC\(selectedCurrency)"
         print(appendApiURL)
+        
+        getBitconData(url: appendApiURL)
     }
     
     override func viewDidLoad() {
@@ -55,6 +59,50 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         currencyPicker.dataSource = self
     }
 
+    
+    //MARK:- NETWORKING
+    
+    
+    func  getBitconData(url: String) {
+      
+        Alamofire.request(url, method: .get)
+            .responseJSON { response in
+                if response.result.isSuccess {
+                    
+                    print("Success! Got bitcoin Data")
+                    
+                    let bitcoinJSON : JSON = JSON(response.result.value as Any)
+                  
+                    
+                    self.updateBitcoinData(json: bitcoinJSON)
+                    
+                }else {
+                    print("error")
+                    
+                    self.currentPriceLabel.text = "Connection Issues"
+                }
+                
+        }
+        
+        
+    }
 
+    //MARK:- JSON
+    func updateBitcoinData(json : JSON) {
+      
+        
+        
+        if let bitcoinResult = json["ask"].double {
+            currentPriceLabel.text = "\(bitcoinResult)"
+            
+            print(bitcoinResult)
+        }
+        else {
+            currentPriceLabel.text = "Price not Available"
+        }
+        
+        
+    }
+    
 }
 
