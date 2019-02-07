@@ -40,7 +40,11 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    
         return countryCurrencyArray[row]
+        
+        
+        
     }
     
     
